@@ -1,0 +1,98 @@
+
+
+.support-tickets {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #2e2e2e; 
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: 100vh; 
+  overflow-y: auto; 
+}
+
+.support-tickets h2 {
+  margin-bottom: 20px;
+  color: #e0e0e0; 
+}
+
+.support-tickets .table-container {
+  max-height: 70vh; 
+  overflow-y: auto; 
+}
+
+.support-tickets table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.support-tickets table th,
+.support-tickets table td {
+  border: 1px solid #444; 
+  padding: 12px; 
+  text-align: left;
+  color: #e0e0e0; 
+}
+
+.support-tickets table th {
+  background-color: #3b3b3b; 
+}
+
+.support-tickets table tr:nth-child(even) {
+  background-color: #3b3b3b; 
+}
+
+.support-tickets table tr:hover {
+  background-color: #444; 
+}
+
+.support-tickets .edit-form {
+  margin-bottom: 20px;
+}
+
+.support-tickets .edit-form input,
+.support-tickets .edit-form select {
+  padding: 8px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #555; 
+  border-radius: 4px;
+  background-color: #3b3b3b; 
+  color: #e0e0e0; 
+}
+
+.support-tickets .edit-form button {
+  padding: 8px 12px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #004080; 
+  color: white;
+  cursor: pointer;
+}
+
+.support-tickets .edit-form button.cancel {
+  background-color: #f44336;
+}
+
+.support-tickets .edit-form button:hover {
+  opacity: 0.8;
+}
+
+.support-tickets .actions button {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: #004080; 
+  color: white;
+  cursor: pointer;
+}
+
+.support-tickets .actions button.deactivate {
+  background-color: #f44336;
+}
+
+.support-tickets .actions button:hover {
+  opacity: 0.8;
+}

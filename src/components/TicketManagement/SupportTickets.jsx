@@ -1,39 +1,9 @@
-import React, { useEffect, useState } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import "./Table.css";
-import { fetchSupportTickets, fetchUsers, updateSupportTicket, deleteSupportTicket } from "../../services/supabaseService";
+// src/components/SupportTickets/SupportTickets.jsx
+import React, { useEffect, useState } from 'react';
+import { fetchSupportTickets, updateSupportTicket, deleteSupportTicket, fetchUsers, insertLogEntry } from '../../services/supabaseService';
+import './SupportTickets.css';
 
-const makeStyle = (status) => {
-  if (status === 'Open') {
-    return {
-      background: 'rgb(255, 173, 173, 0.5)',
-      color: 'red',
-    };
-  } else if (status === 'In-Progress') {
-    return {
-      background: 'rgb(255, 255, 173, 0.5)',
-      color: 'orange',
-    };
-  } else if (status === 'Resolved') {
-    return {
-      background: 'rgb(173, 255, 173, 0.5)',
-      color: 'green',
-    };
-  } else {
-    return {
-      background: 'rgb(173, 173, 255, 0.5)',
-      color: 'blue',
-    };
-  }
-};
-
-export default function BasicTable() {
+const SupportTickets = () => {
   const [tickets, setTickets] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +14,7 @@ export default function BasicTable() {
   const [editPriority, setEditPriority] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editUserId, setEditUserId] = useState('');
+  const adminId = 1; // Replace with the actual admin ID
 
   useEffect(() => {
     const getTicketsAndUsers = async () => {
@@ -74,6 +45,13 @@ export default function BasicTable() {
 
   const handleUpdate = async () => {
     try {
+      const changes = [];
+      if (editingTicket.category !== editCategory) changes.push(`Category changed from ${editingTicket.category} to ${editCategory}`);
+      if (editingTicket.status !== editStatus) changes.push(`Status changed from ${editingTicket.status} to ${editStatus}`);
+      if (editingTicket.priority !== editPriority) changes.push(`Priority changed from ${editingTicket.priority} to ${editPriority}`);
+      if (editingTicket.description !== editDescription) changes.push(`Description changed`);
+      if (editingTicket.user_id !== editUserId) changes.push(`Assigned user changed from ${getUserEmail(editingTicket.user_id)} to ${getUserEmail(editUserId)}`);
+
       await updateSupportTicket(editingTicket.ticket_id, {
         category: editCategory,
         status: editStatus,
@@ -89,6 +67,7 @@ export default function BasicTable() {
         description: editDescription,
         user_id: editUserId,
       } : ticket));
+      await insertLogEntry(adminId, 'Edit Ticket', `Edited ticket ${editingTicket.ticket_id}: ${changes.join(', ')}`);
       setEditingTicket(null);
     } catch (err) {
       setError("could not update ticket");
@@ -100,6 +79,7 @@ export default function BasicTable() {
     try {
       await deleteSupportTicket(ticketId);
       setTickets(tickets.filter(ticket => ticket.ticket_id !== ticketId));
+      await insertLogEntry(adminId, 'Delete Ticket', `Deleted ticket ${ticketId}`);
     } catch (err) {
       setError("could not delete ticket");
       console.log(err);
@@ -115,8 +95,8 @@ export default function BasicTable() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="Table">
-      <h3 style={{ color: "#e0e0e0" }}>Support Tickets</h3>
+    <div className="support-tickets">
+      <h2>Support Tickets</h2>
       {editingTicket && (
         <div className="edit-form">
           <h3>Edit Ticket</h3>
@@ -151,39 +131,37 @@ export default function BasicTable() {
           <button className="cancel" onClick={() => setEditingTicket(null)}>Cancel</button>
         </div>
       )}
-      <TableContainer component={Paper} style={{ boxShadow: "0px 13px 20px 0px #00000050", backgroundColor: "#2e2e2e" }}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell style={{ color: "#e0e0e0" }}>User</TableCell>
-              <TableCell align="left" style={{ color: "#e0e0e0" }}>Category</TableCell>
-              <TableCell align="left" style={{ color: "#e0e0e0" }}>Status</TableCell>
-              <TableCell align="left" style={{ color: "#e0e0e0" }}>Priority</TableCell>
-              <TableCell align="left" style={{ color: "#e0e0e0" }}>Description</TableCell>
-              <TableCell align="left" style={{ color: "#e0e0e0" }}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tickets.map((ticket) => (
-              <TableRow key={ticket.ticket_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                <TableCell component="th" scope="row" style={{ color: "#e0e0e0" }}>
-                  {getUserEmail(ticket.user_id)}
-                </TableCell>
-                <TableCell align="left" style={{ color: "#e0e0e0" }}>{ticket.category}</TableCell>
-                <TableCell align="left">
-                  <span className="status" style={makeStyle(ticket.status)}>{ticket.status}</span>
-                </TableCell>
-                <TableCell align="left" style={{ color: "#e0e0e0" }}>{ticket.priority}</TableCell>
-                <TableCell align="left" style={{ color: "#e0e0e0" }}>{ticket.description}</TableCell>
-                <TableCell align="left" className="Details">
-                  <button onClick={() => handleEdit(ticket)} style={{ color: "#e0e0e0", backgroundColor: "#3b3b3b", border: "none", padding: "5px 10px", borderRadius: "5px" }}>Edit</button>
-                  <button onClick={() => handleDelete(ticket.ticket_id)} style={{ color: "#e0e0e0", backgroundColor: "#3b3b3b", border: "none", padding: "5px 10px", borderRadius: "5px", marginLeft: "5px" }}>Delete</button>
-                </TableCell>
-              </TableRow>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Description</th>
+              <th>Assigned User</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tickets.map(ticket => (
+              <tr key={ticket.ticket_id}>
+                <td>{ticket.category}</td>
+                <td>{ticket.status}</td>
+                <td>{ticket.priority}</td>
+                <td>{ticket.description}</td>
+                <td>{getUserEmail(ticket.user_id)}</td>
+                <td className="actions">
+                  <button onClick={() => handleEdit(ticket)}>Edit</button>
+                  <button className="deactivate" onClick={() => handleDelete(ticket.ticket_id)}>Delete</button>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-}
+};
+
+export default SupportTickets;
