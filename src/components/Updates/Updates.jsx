@@ -12,7 +12,6 @@ const Updates = () => {
       try {
         const logsData = await fetchAdminManagementLogs();
         const usersData = await fetchUsers();
-        setUsers(usersData);
 
         const updates = logsData
           .map(log => ({
