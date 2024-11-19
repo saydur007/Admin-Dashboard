@@ -49,7 +49,7 @@ const Cards = () => {
       title: "Open Tickets",
       value: tickets.filter(ticket => ticket.status === "Open").length,
       color: { backGround: "linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%)", boxShadow: "0px 10px 20px 0px #3b82f6" },
-      barValue: (tickets.filter(ticket => ticket.status === "Open").length / tickets.length) * 100,
+      barValue: ((tickets.filter(ticket => ticket.status === "Open").length / tickets.length) * 100).toFixed(2),
       png: "UilClipboardAlt",
       series: [{ name: "Tickets", data: tickets.map(ticket => ticket.created_at) }],
     },
