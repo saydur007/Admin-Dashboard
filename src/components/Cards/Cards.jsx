@@ -57,7 +57,7 @@ const Cards = () => {
       title: "Total Content",
       value: contentData.length,
       color: { backGround: "linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%)", boxShadow: "0px 10px 20px 0px #1e3a8a" },
-      barValue: (contentData.filter(content => content.created_at).length / contentData.length) * 100,
+      barValue: (contentData.length / contentData.length) * 100,
       png: "UilPackage",
       series: [{ name: "Content", data: contentData.map(content => content.created_at) }],
     },

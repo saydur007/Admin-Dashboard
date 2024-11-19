@@ -114,6 +114,34 @@ export const fetchUserProfiles = async () => {
     return data;
   };
 
+  // Add content
+export const addContent = async (newContent) => {
+    const { data, error } = await supabase.from('08_content').insert(newContent);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+
+  
+// Update content
+export const updateContent = async (contentId, updates) => {
+    const { data, error } = await supabase.from('08_content').update(updates).eq('content_id', contentId);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+  
+  // Delete content
+  export const deleteContent = async (contentId) => {
+    const { data, error } = await supabase.from('08_content').delete().eq('content_id', contentId);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+
   // Update feedback
 export const updateFeedback = async (feedbackId, updates) => {
     const { data, error } = await supabase.from('07_feedback').update(updates).eq('feedback_id', feedbackId);
@@ -131,10 +159,47 @@ export const updateFeedback = async (feedbackId, updates) => {
     }
     return data;
   };
+
+// Add event
+export const addEvent = async (newEvent) => {
+    const { data, error } = await supabase.from('09_events').insert(newEvent);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+
+  
+// Update event
+export const updateEvent = async (eventId, updates) => {
+    const { data, error } = await supabase.from('09_events').update(updates).eq('event_id', eventId);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+  
+  // Delete event
+  export const deleteEvent = async (eventId) => {
+    const { data, error } = await supabase.from('09_events').delete().eq('event_id', eventId);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
   
   // Fetch all event registrations
   export const fetchEventRegistrations = async () => {
     const { data, error } = await supabase.from('10_event_registration').select('*');
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+
+  // Add event registration
+export const addEventRegistration = async (newRegistration) => {
+    const { data, error } = await supabase.from('10_event_registrations').insert(newRegistration);
     if (error) {
       throw new Error(error.message);
     }
