@@ -4,7 +4,6 @@ import { fetchAdminManagementLogs, fetchUsers } from "../../services/supabaseSer
 
 const Updates = () => {
   const [updatesData, setUpdatesData] = useState([]);
-  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
