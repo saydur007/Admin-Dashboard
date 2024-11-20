@@ -60,6 +60,15 @@ export const fetchUserProfiles = async () => {
     }
     return data;
   };
+
+  // Add reward
+export const addReward = async (newReward) => {
+    const { data, error } = await supabase.from('04_rewards').insert(newReward);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
   
   // Fetch all support tickets
   export const fetchSupportTickets = async () => {
@@ -226,16 +235,45 @@ export const addEventRegistration = async (newRegistration) => {
   
   // Fetch all offers
   export const fetchOffers = async () => {
-    const { data, error } = await supabase.from('offer').select('*');
+    const { data, error } = await supabase.from('Offer').select('*');
     if (error) {
       throw new Error(error.message);
     }
     return data;
   };
   
+  // Update offer
+export const updateOffer = async (offerId, updates) => {
+    const { data, error } = await supabase.from('Offer').update(updates).eq('offer_id', offerId);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+
+  
+// Delete offer
+export const deleteOffer = async (offerId) => {
+    const { data, error } = await supabase.from('offers').delete().eq('offer_id', offerId);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+  
+
   // Fetch all redemptions
   export const fetchRedemptions = async () => {
-    const { data, error } = await supabase.from('redemptions').select('*');
+    const { data, error } = await supabase.from('Redemptions').select('*');
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  };
+
+  // Add redemption
+export const addRedemption = async (newRedemption) => {
+    const { data, error } = await supabase.from('Redemptions').insert(newRedemption);
     if (error) {
       throw new Error(error.message);
     }

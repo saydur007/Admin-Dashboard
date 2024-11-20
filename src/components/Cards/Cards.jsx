@@ -38,10 +38,10 @@ const Cards = () => {
 
   const cardsData = [
     {
-      title: "Total Users",
+      title: "Active Users",
       value: users.length,
       color: { backGround: "linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%)", boxShadow: "0px 10px 20px 0px #1e3a8a" },
-      barValue: (users.filter(user => user.status === "Active").length / users.length) * 100,
+      barValue: ((users.filter(user => user.status === "Active").length / users.length) * 100).toFixed(2),
       png: "UilUsersAlt",
       series: [{ name: "Users", data: users.map(user => user.created_at) }],
     },
