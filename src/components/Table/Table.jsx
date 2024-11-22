@@ -127,7 +127,7 @@ export default function BasicTable() {
           </select>
           <select value={editStatus} onChange={(e) => setEditStatus(e.target.value)}>
             <option value="Open">Open</option>
-            <option value="In-Progress">In-Progress</option>
+            <option value="In Progress">In Progress</option>
             <option value="Resolved">Resolved</option>
             <option value="Closed">Closed</option>
           </select>
