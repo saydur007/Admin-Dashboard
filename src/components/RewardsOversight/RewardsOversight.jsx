@@ -1,6 +1,6 @@
 // src/components/RewardsOversight/RewardsOversight.jsx
 import React, { useEffect, useState } from 'react';
-import { fetchOffers, updateOffer, deleteOffer, fetchRewards, addReward, fetchRedemptions, addRedemption, fetchUsers } from '../../services/supabaseService';
+import { fetchOffers, deleteOffer, fetchRewards, addReward, fetchRedemptions, addRedemption, fetchUsers, insertLogEntry } from '../../services/supabaseService';
 import './RewardsOversight.css';
 
 const RewardsOversight = () => {
@@ -11,54 +11,56 @@ const RewardsOversight = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newReward, setNewReward] = useState({ reward_description: '', points: 0, is_active: true });
+  const adminId = 1; // Replace with the actual admin ID
+
+  const getData = async () => {
+    try {
+      const offersData = await fetchOffers();
+      setOffers(offersData);
+      const rewardsData = await fetchRewards();
+      setRewards(rewardsData);
+      const redemptionsData = await fetchRedemptions();
+      setRedemptions(redemptionsData);
+      const usersData = await fetchUsers();
+      setUsers(usersData);
+    } catch (err) {
+      setError("could not fetch data");
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const offersData = await fetchOffers();
-        setOffers(offersData);
-        const rewardsData = await fetchRewards();
-        setRewards(rewardsData);
-        const redemptionsData = await fetchRedemptions();
-        setRedemptions(redemptionsData);
-        const usersData = await fetchUsers();
-        setUsers(usersData);
-      } catch (err) {
-        setError("could not fetch data");
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     getData();
   }, []);
 
   const handleApproveOffer = async (offer) => {
     try {
-      await updateOffer(offer.offer_id, { status: 'Approved' });
-      setOffers(offers.map(o => o.offer_id === offer.offer_id ? { ...o, status: 'Approved' } : o));
+      const currentDate = new Date().toISOString();
       await addRedemption({
         user_id: offer.user_id,
         reward_id: offer.reward_id,
-        redeemed_date: new Date(),
+        redeemed_date: currentDate,
         redeem_id: offer.offer_id,
         is_reward_redemption: true,
         points_redeemed: offer.awardable_points,
         is_active: true
       });
+      await deleteOffer(offer.offer_id);
+      setOffers(offers.filter(o => o.offer_id !== offer.offer_id));
+      setRedemptions([...redemptions, {
+        user_id: offer.user_id,
+        reward_id: offer.reward_id,
+        redeemed_date: currentDate,
+        redeem_id: offer.offer_id,
+        is_reward_redemption: true,
+        points_redeemed: offer.awardable_points,
+        is_active: true
+      }]);
+      await insertLogEntry(adminId, 'Approve Offer', `Approved offer ${offer.offer_id} for user ${offer.user_id}`);
     } catch (err) {
       setError("could not approve offer");
-      console.log(err);
-    }
-  };
-
-  const handleDenyOffer = async (offerId) => {
-    try {
-      await deleteOffer(offerId);
-      setOffers(offers.filter(o => o.offer_id !== offerId));
-    } catch (err) {
-      setError("could not deny offer");
       console.log(err);
     }
   };
@@ -68,6 +70,7 @@ const RewardsOversight = () => {
       const addedReward = await addReward(newReward);
       setRewards([...rewards, ...addedReward]);
       setNewReward({ reward_description: '', points: 0, is_active: true });
+      await insertLogEntry(adminId, 'Add Reward', `Added reward ${addedReward[0].reward_id}`);
     } catch (err) {
       setError("could not add reward");
       console.log(err);
@@ -85,6 +88,7 @@ const RewardsOversight = () => {
   return (
     <div className="rewards-oversight">
       <h2>Rewards Oversight</h2>
+      <button onClick={getData}>Refresh</button>
       <div className="table-container">
         <h3>Offers</h3>
         <table>
@@ -94,8 +98,6 @@ const RewardsOversight = () => {
               <th>Offer Name</th>
               <th>Offer Description</th>
               <th>Points</th>
-              <th>Status</th>
-              <th>Requested At</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -106,15 +108,8 @@ const RewardsOversight = () => {
                 <td>{offer.offer_name}</td>
                 <td>{offer.offer_description}</td>
                 <td>{offer.awardable_points}</td>
-                <td>{offer.status}</td>
-                <td>{new Date(offer.requested_at).toLocaleString()}</td>
                 <td className="actions">
-                  {offer.status === 'Pending' && (
-                    <>
-                      <button onClick={() => handleApproveOffer(offer)}>Approve</button>
-                      <button className="deny" onClick={() => handleDenyOffer(offer.offer_id)}>Deny</button>
-                    </>
-                  )}
+                  <button onClick={() => handleApproveOffer(offer)}>Approve</button>
                 </td>
               </tr>
             ))}
@@ -143,7 +138,6 @@ const RewardsOversight = () => {
             <tr>
               <th>Description</th>
               <th>Points Required</th>
-              <th>Created At</th>
             </tr>
           </thead>
           <tbody>
@@ -151,7 +145,6 @@ const RewardsOversight = () => {
               <tr key={reward.reward_id}>
                 <td>{reward.reward_description}</td>
                 <td>{reward.points}</td>
-                <td>{new Date(reward.created_at).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -172,7 +165,7 @@ const RewardsOversight = () => {
               <tr key={redemption.redemption_id}>
                 <td>{getUserEmail(redemption.user_id)}</td>
                 <td>{rewards.find(r => r.reward_id === redemption.reward_id)?.reward_description || 'Unknown Reward'}</td>
-                <td>{new Date(redemption.redeemed_at).toLocaleString()}</td>
+                <td>{new Date(redemption.redeemed_date).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
