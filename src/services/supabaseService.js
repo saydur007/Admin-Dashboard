@@ -42,6 +42,15 @@ export const fetchUserProfiles = async () => {
     }
     return data;
   };
+
+  // Delete a user profile
+export const deleteUserProfile = async (userId) => {
+  const { data, error } = await supabase.from('02_user_profile').delete().eq('user_id', userId);
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
   
   // Fetch all activity logs
   export const fetchActivityLogs = async () => {

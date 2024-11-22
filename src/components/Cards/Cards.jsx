@@ -62,10 +62,10 @@ const Cards = () => {
       series: [{ name: "Content", data: contentData.map(content => content.created_at) }],
     },
     {
-      title: "Total Rewards",
+      title: "Active Rewards",
       value: rewardsData.length,
       color: { backGround: "linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%)", boxShadow: "0px 10px 20px 0px #3b82f6" },
-      barValue: (rewardsData.filter(reward => reward.is_active).length / rewardsData.length) * 100,
+      barValue: ((rewardsData.filter(reward => reward.is_active).length / rewardsData.length) * 100).toFixed(2),
       png: "UilUsdSquare",
       series: [{ name: "Rewards", data: rewardsData.map(reward => reward.earned_date) }],
     },

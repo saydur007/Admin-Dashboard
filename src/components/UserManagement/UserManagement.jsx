@@ -1,6 +1,6 @@
 // src/components/UserManagement/UserManagement.jsx
 import React, { useEffect, useState } from 'react';
-import { fetchUsers, fetchUserProfiles, updateUser, updateUserProfile, deleteUser, insertLogEntry } from '../../services/supabaseService';
+import { fetchUsers, fetchUserProfiles, updateUser, updateUserProfile, deleteUser, deleteUserProfile, insertLogEntry } from '../../services/supabaseService';
 import './UserManagement.css';
 
 const UserManagement = () => {
@@ -72,9 +72,13 @@ const UserManagement = () => {
 
   const handleDelete = async (userId) => {
     try {
+      const profile = profiles.find(profile => profile.user_id === userId);
+      if (profile) {
+        await deleteUserProfile(userId);
+        setProfiles(profiles.filter(profile => profile.user_id !== userId));
+      }
       await deleteUser(userId);
       setUsers(users.filter(user => user.user_id !== userId));
-      setProfiles(profiles.filter(profile => profile.user_id !== userId));
       await insertLogEntry(adminId, 'Delete User', `Deleted user ${userId}`);
     } catch (err) {
       setError("could not delete user");

@@ -1,20 +1,30 @@
-.MainDash{
-    /* padding-top: 1rem; */
+.MainDash {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden; /* Prevent scrolling on the entire dashboard */
+}
+
+.MainDash h1 {
+    margin-bottom: 1rem;
+}
+
+.table-container {
+    flex: 1;
+    overflow-y: auto; /* Enable vertical scrolling */
+    margin-top: 1rem;
 }
 
 @media screen and (max-width: 1200px) {
-    .MainDash{
-        justify-content:flex-start;
+    .MainDash {
+        justify-content: flex-start;
         margin-top: 2rem;
     }
 }
 
-@media screen and (max-width: 768px)
-{
-    .MainDash{
+@media screen and (max-width: 768px) {
+    .MainDash {
         align-items: center;
     }
 }
