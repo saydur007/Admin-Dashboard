@@ -68,9 +68,12 @@ const RewardsOversight = () => {
   const handleAddReward = async () => {
     try {
       const addedReward = await addReward(newReward);
-      setRewards([...rewards, ...addedReward]);
+      if(addedReward){
+        setRewards([...rewards, ...addedReward]);
+      }
+   
       setNewReward({ reward_description: '', points: 0, is_active: true });
-      await insertLogEntry(adminId, 'Add Reward', `Added reward ${addedReward[0].reward_id}`);
+      await insertLogEntry(adminId, 'Add Reward', `Added reward`);
     } catch (err) {
       setError("could not add reward");
       console.log(err);

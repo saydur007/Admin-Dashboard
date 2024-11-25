@@ -52,7 +52,8 @@ const ContentManagement = () => {
   const handleAddContent = async () => {
     try {
       const addedContent = await addContent(newContent);
-      setContent([...content, ...addedContent]);
+      if(addedContent)
+      { setContent([...content, ...addedContent]);}
       await insertLogEntry(adminId, 'Add Content', `Added content: ${newContent.title}`);
       setNewContent({ title: '', content_type: 'Article', content: '', category: '', created_by: 1 });
     } catch (err) {
@@ -64,9 +65,10 @@ const ContentManagement = () => {
   const handleAddEvent = async () => {
     try {
       const addedEvent = await addEvent(newEvent);
-      setEvents([...events, ...addedEvent]);
       await insertLogEntry(adminId, 'Add Event', `Added event: ${newEvent.event_name}`);
       setNewEvent({ event_name: '', description: '', event_date: '', created_by: 1 });
+      if(addedEvent)
+      { setEvents([...events, ...addedEvent]);}
     } catch (err) {
       setError("could not add event");
       console.log(err);
